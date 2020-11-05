@@ -1,0 +1,117 @@
+module Rental where 
+
+import Payment
+import DA.Time (wholeDays, subTime)
+
+template RentalAgreement 
+  with 
+    tenant: Party 
+    owner: Party 
+    operator: Party
+    address: Text 
+    features: Text
+    end: Time 
+    start: Time 
+    rate: Decimal
+    currency: Text  
+  where 
+    signatory tenant, owner, --operator
+
+    controller owner can 
+      EndRental: ContractId Property 
+        do 
+          now <- getTime 
+          assert (now > end)
+          create Property 
+            with 
+              optPublic = None 
+              ..
+
+template Offer 
+  with 
+    tenant: Party 
+    owner: Party 
+    operator: Party 
+    address: Text 
+    features: Text
+    end: Time 
+    start: Time 
+    rate: Decimal
+    currency: Text
+  where 
+    signatory owner, operator 
+
+    controller tenant can 
+      Accept: (ContractId RentalAgreement, ContractId Payable)
+        do 
+          payable <- create Payable 
+            with 
+              to = owner 
+              from = tenant 
+              amount = rate * intToDecimal (wholeDays (end `subTime` start))
+              due = start
+              memo = "Rental of " <> address <> " from " <> show start <> " to " <> show end <> "."
+              ..
+
+          rental <- create RentalAgreement with ..
+
+          return (rental, payable)
+
+      Decline: ContractId Property 
+        do 
+          create Property 
+            with 
+              optPublic = None 
+              ..
+
+template Property 
+  with 
+    owner: Party 
+    address: Text 
+    features: Text 
+    operator: Party 
+    optPublic: Optional Party 
+  where 
+    signatory operator, owner 
+    observer optPublic
+
+    key (operator, owner, address): (Party, Party, Text)
+    maintainer key._1
+
+    controller owner can 
+      OfferToTentant: ContractId Offer 
+        with 
+          tenant: Party 
+          start: Time 
+          end: Time 
+          rate: Decimal 
+          currency: Text
+        do 
+          create Offer with ..
+
+      Publish: ContractId Property
+        with 
+          public: Party 
+        do 
+          create this with optPublic = Some public 
+
+      Unpublish: ContractId Property 
+        do create this with optPublic = None
+
+template PropertyKycRequest 
+  with 
+    owner: Party 
+    address: Text 
+    features: Text 
+    operator: Party 
+    proofOfOwnership: Text
+  where 
+    signatory owner 
+
+    controller operator can 
+      VerifyProperty: ContractId Property 
+        do 
+          create Property
+            with 
+              optPublic = None 
+              ..

@@ -1,0 +1,49 @@
+module Payment where 
+
+template Payable 
+  with
+    to: Party 
+    from: Party 
+    amount: Decimal 
+    currency: Text 
+    due: Time
+    memo: Text
+  where 
+    signatory from, to 
+
+    controller to can 
+      SendPayment: ContractId SettledPayment 
+        with 
+          proof: Text
+        do 
+          paid <- getTime 
+          create SettledPayment with .. 
+
+    controller from can 
+      Fail: ContractId FailedPayment
+        do 
+          claimed <- getTime 
+          create FailedPayment with ..
+
+template SettledPayment 
+  with 
+    to: Party 
+    from: Party 
+    amount: Decimal 
+    currency: Text 
+    due: Time 
+    paid: Time
+    proof: Text 
+  where 
+    signatory from, to 
+
+template FailedPayment
+  with 
+    to: Party 
+    from: Party 
+    amount: Decimal 
+    currency: Text 
+    due: Time 
+    claimed: Time 
+  where 
+    signatory from, to 
