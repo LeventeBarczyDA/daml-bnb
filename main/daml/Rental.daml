@@ -79,7 +79,7 @@ template Property
     maintainer key._1
 
     controller owner can 
-      OfferToTentant: ContractId Offer 
+      OfferToTennant: ContractId Offer 
         with 
           tenant: Party 
           start: Time 
@@ -115,3 +115,24 @@ template PropertyKycRequest
             with 
               optPublic = None 
               ..
+
+template IndicationOfInterest
+  with 
+    tenant: Party 
+    owner: Party
+    address: Text 
+    operator: Party 
+    start: Time 
+    end: Time 
+    currency: Text 
+    message: Text
+  where 
+    signatory tenant
+    observer operator
+
+    controller owner can 
+      MakeAnOffer: ContractId Offer 
+        with 
+          rate: Decimal 
+        do 
+          exerciseByKey @Property (operator, owner, address) OfferToTennant with ..
