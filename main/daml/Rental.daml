@@ -79,7 +79,7 @@ template Property
     maintainer key._1
 
     controller owner can 
-      OfferToTennant: ContractId Offer 
+      OfferToTenant: ContractId Offer 
         with 
           tenant: Party 
           start: Time 
@@ -135,4 +135,4 @@ template IndicationOfInterest
         with 
           rate: Decimal 
         do 
-          exerciseByKey @Property (operator, owner, address) OfferToTennant with ..
+          exerciseByKey @Property (operator, owner, address) OfferToTenant with ..
