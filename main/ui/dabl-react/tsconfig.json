@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": [
+      "DOM",
+      "es2015"
+     ],
+    "jsx": "react",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "esModuleInterop": true,
+    "outDir": "lib/",
+    "module": "CommonJS",
+    "declaration": true,
+    "sourceMap": true
+  },
+  "files": [
+    "index.ts",
+    "JwtTokens.ts",
+    "PublicLedger.ts",
+    "WellKnownParties.ts"
+  ]
+}

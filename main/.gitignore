@@ -1,1 +1,6 @@
 /.daml
+ui/node_modules
+daml.js/
+ui/build
+*.log
+deploy

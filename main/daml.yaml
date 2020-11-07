@@ -5,10 +5,13 @@ init-script: Main:setup
 parties:
   - Alice
   - Bob
+  - Public
+  - Operator
 version: 0.0.1
 dependencies:
   - daml-prim
   - daml-stdlib
   - daml-script
 sandbox-options:
-  - --wall-clock-time
+ - --ledgerid=damlbnb
+ - --wall-clock-time
