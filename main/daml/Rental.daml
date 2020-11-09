@@ -136,7 +136,6 @@ template IndicationOfInterest
     operator: Party 
     start: Time 
     end: Time 
-    currency: Text 
     message: Text
   where 
     signatory tenant
@@ -144,7 +143,5 @@ template IndicationOfInterest
 
     controller owner can 
       MakeAnOffer: ContractId Offer 
-        with 
-          rate: Decimal 
         do 
           exerciseByKey @Property (operator, owner, address) OfferToTenant with ..
