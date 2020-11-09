@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import Ledger, { CreateEvent } from "@daml/ledger";
 import { useStreamQuery, useLedger, useParty } from "@daml/react";
 import { Accept, Decline, Offer, RentalAgreement } from "@daml.js/damlbnb-0.0.1/lib/Rental";
-import { Button, Container, Paper } from "@material-ui/core";
+import { Button, Container, Grid, Paper } from "@material-ui/core";
 import PropertyCard from "../components/PropertyCard/PropertyCard";
 import ReviewOfferDialog from "../components/ReviewOfferDialog"
 import { formatISO, parseISO } from "date-fns"
@@ -53,29 +53,43 @@ export default function Bookings() {
 
     return (
         <>
-            {myOffers.length > 0 && (
-                <Container>
-                    <h2>Offers</h2>
-                    {myOffers.map(offer => (
-                        <OfferPropertyCard offer={offer} makeOffer={makeOffer(offer)} />
-                    ))}
-                </Container>
-            )}
-            {myRentalAgreements.length > 0 && (
-                <Container>
-                    <h2>Rental Agreements</h2>
-                    {myRentalAgreements.map(rental => (
-                        <PropertyCard property={rental.payload}>
-                            {`Staying between ${formatDateString(rental.payload.start)} and ${formatDateString(rental.payload.end)}`}
-                        </PropertyCard>
-                    ))}
-                </Container>
-            )}
-            { (!myOffers.length && !myRentalAgreements.length) && (
-                <Container>
-                    <Paper>No bookings or agreements</Paper>
-                </Container>
-            )}
+            {
+                myOffers.length > 0 && (
+                    <Container>
+                        <h2>Offers</h2>
+                        <Grid container spacing={2} direction="row" justify="flex-start" alignItems="flex-start">
+                            {myOffers.map(offer => (
+                                <Grid item key={offer.contractId}>
+                                    <OfferPropertyCard offer={offer} makeOffer={makeOffer(offer)} />
+                                </Grid>
+                            ))}
+                        </Grid>
+                    </Container>
+                )
+            }
+            {
+                myRentalAgreements.length > 0 && (
+                    <Container>
+                        <h2>Rental Agreements</h2>
+                        <Grid container spacing={2} direction="row" justify="flex-start" alignItems="flex-start">
+                            {myRentalAgreements.map(rental => (
+                                <Grid item key={rental.contractId}>
+                                    <PropertyCard property={rental.payload}>
+                                        {`Staying between ${formatDateString(rental.payload.start)} and ${formatDateString(rental.payload.end)}`}
+                                    </PropertyCard>
+                                </Grid>
+                            ))}
+                        </Grid>
+                    </Container>
+                )
+            }
+            {
+                (!myOffers.length && !myRentalAgreements.length) && (
+                    <Container>
+                        <Paper>No bookings or agreements</Paper>
+                    </Container>
+                )
+            }
         </>
     )
 }

@@ -9,7 +9,7 @@ import FormControl from "@material-ui/core/FormControl";
 import { IndicationOfInterest, Property } from "@daml.js/damlbnb-0.0.1/lib/Rental";
 import { useParty } from "@daml/react";
 import { Party } from "@daml/types";
-import { FormGroup, Select, MenuItem } from "@material-ui/core";
+import { FormGroup } from "@material-ui/core";
 import { formatISO, addDays, parseISO } from 'date-fns'
 
 export interface IndicateInterestDialogProps {
@@ -19,14 +19,11 @@ export interface IndicateInterestDialogProps {
     onClose: (state: IndicationOfInterest | null) => Promise<void>
 }
 
-const availableCurrencies = ['USD', 'GBP', 'EUR', 'CAD', 'BRL', 'COP']
-
 export function IndicateInterestDialog(props: IndicateInterestDialogProps) {
     const party = useParty()
     const [startDate, setStartDate] = useState(new Date())
     const [endDate, setEndDate] = useState(addDays(new Date(), 5))
     const [message, setMessage] = useState('')
-    const [currency, setCurrency] = useState(availableCurrencies[0])
     const { property } = props
 
     const formatDate = (date: Date) => formatISO(date, { representation: 'date' })
@@ -40,7 +37,6 @@ export function IndicateInterestDialog(props: IndicateInterestDialogProps) {
         // assuming utc is a terrible thing to do
         start: startDate.toISOString(),
         end: endDate.toISOString(),
-        currency,
         message
     })
 
@@ -58,11 +54,6 @@ export function IndicateInterestDialog(props: IndicateInterestDialogProps) {
                             type="date"
                             value={formatDate(endDate)}
                             onChange={e => setEndDate(parseDate(e.target.value))} />
-                        <Select value={currency} onChange={e => setCurrency(e.target.value as string)}>
-                            {availableCurrencies.map(c => (
-                                <MenuItem value={c}>{c}</MenuItem>
-                            ))}
-                        </Select>
                     </FormGroup>
                     <FormGroup row>
                         <TextField

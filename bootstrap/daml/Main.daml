@@ -1,0 +1,82 @@
+module Main where
+
+import Daml.Script
+import Rental
+import qualified DA.TextMap as Map
+import DA.Optional (fromSomeNote)
+import DA.Tuple (swap)
+
+data Participant = Participant
+  with
+    host: Text
+    port: Int
+    access_token: Text
+
+data Participants = Participants
+  with
+    default_participant: Participant
+    participants: Map.TextMap Participant
+    party_participants: Map.TextMap Text
+
+reverseTextMap: Map.TextMap Text -> Map.TextMap Text
+reverseTextMap tm = Map.fromList $ swap <$> Map.toList tm
+
+ownerName = "leventeBarczy"
+
+setup : Participants -> Script ()
+setup participants = do
+  let 
+    parties = reverseTextMap participants.party_participants
+    [operator, public, owner] = map (\name ->
+      fromSomeNote ("'" <> name <> "' is not a valid party") $
+        partyFromText $ 
+          fromSomeNote ("Cannot find " <> name <> " in participants.") $
+            Map.lookup name parties) ["userAdmin", "public", ownerName]
+
+    requests = [
+      PropertyKycRequest 
+        with 
+          address = "123 Main Street, Anywhere USA"
+          features = "Washer"
+          proofOfOwnership = "Certificate"
+          .., 
+      PropertyKycRequest 
+        with 
+          address = "456 Main Street, Anywhere USA"
+          features = "AirConditioning"
+          proofOfOwnership = "Coop Certificate"
+          .., 
+      PropertyKycRequest 
+        with 
+          address = "123 Pine Street, Anywhere USA"
+          features = "Pets allowed"
+          proofOfOwnership = "Cert"
+          .., 
+      PropertyKycRequest 
+        with 
+          address = "789 Elm Street, Anywhere USA"
+          features = "Yard"
+          proofOfOwnership = "Cert"
+          .., 
+      PropertyKycRequest 
+        with 
+          address = "321 Oak Street, Anywhere USA"
+          features = "Grill"
+          proofOfOwnership = ""
+          .., 
+      PropertyKycRequest 
+        with 
+          address = "777 Elm Street, Anywhere USA"
+          features = "Outdoor shower"
+          proofOfOwnership = "Cert"
+          ..]
+
+  requestIds <- mapA (\request -> 
+    submit owner $
+      createCmd request) requests
+
+  properties <- mapA (\requestId ->
+    submit operator $
+      exerciseCmd requestId VerifyProperty) requestIds
+
+  pure ()
