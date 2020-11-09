@@ -1,0 +1,15 @@
+sdk-version: 1.6.0
+name: bootstrap
+source: daml
+init-script: Main:setup
+parties:
+  - Alice
+  - Bob
+version: 0.0.1
+dependencies:
+  - daml-prim
+  - daml-stdlib
+  - daml-script
+  - ../main/.daml/dist/damlbnb-0.0.1.dar
+sandbox-options:
+  - --wall-clock-time
