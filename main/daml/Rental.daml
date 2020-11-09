@@ -25,6 +25,7 @@ template RentalAgreement
           create Property 
             with 
               optPublic = None 
+              optRate = Some (currency, rate)
               ..
 
 template Offer 
@@ -62,6 +63,7 @@ template Offer
           create Property 
             with 
               optPublic = None 
+              optRate = None
               ..
 
 template Property 
@@ -71,6 +73,7 @@ template Property
     features: Text 
     operator: Party 
     optPublic: Optional Party 
+    optRate: Optional (Text, Decimal) 
   where 
     signatory operator, owner 
     observer optPublic
@@ -84,10 +87,18 @@ template Property
           tenant: Party 
           start: Time 
           end: Time 
-          rate: Decimal 
-          currency: Text
         do 
+          let 
+            Some (currency, rate) = optRate 
           create Offer with ..
+
+      SetRate: ContractId Property 
+        with 
+          rate: Decimal 
+          currency: Text 
+        do 
+          create this 
+            with optRate = Some (currency, rate)
 
       Publish: ContractId Property
         with 
@@ -114,6 +125,7 @@ template PropertyKycRequest
           create Property
             with 
               optPublic = None 
+              optRate = None
               ..
 
 template IndicationOfInterest
